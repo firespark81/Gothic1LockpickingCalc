@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gothic Remake Lockpicking Tool</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #151b2d;
+            --card-border: #242c42;
+            --text-main: #f8fafc;
+            --text-secondary: #94a3b8;
+            --primary-grad: linear-gradient(135deg, #ff8700 0%, #ed6300 100%);
+            --primary-color: #ed6300;
+            --secondary-bg: #1e293b;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --target-gold: #e0a96d;
+            --shadow-glow: 0 0 15px rgba(237, 99, 0, 0.4);
+            --left-badge-bg: rgba(59, 130, 246, 0.15);
+            --left-badge-color: #60a5fa;
+            --right-badge-bg: rgba(168, 85, 247, 0.15);
+            --right-badge-color: #c084fc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 40px 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ff8700 0%, #ed6300 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        @media (max-width: 1024px) {
+            .app-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+        }
+
+        .card h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 12px;
+        }
+
+        .card h2 span.step-number {
+            background: var(--primary-grad);
+            color: #0b0f19;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 800;
+        }
+
+        /* Form styling */
+        .instruction-text {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+
+        .pos-selector-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .pos-label {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .pos-btn-group {
+            display: flex;
+            gap: 4px;
+            background: #0d1222;
+            padding: 4px;
+            border-radius: 10px;
+            border: 1px solid var(--card-border);
+        }
+
+        .pos-btn {
+            width: 34px;
+            height: 34px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .pos-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+        }
+
+        .pos-btn.selected {
+            background: var(--primary-grad);
+            color: #0b0f19;
+            box-shadow: 0 0 8px rgba(237, 99, 0, 0.4);
+        }
+
+        /* Rules Editor Row Styles */
+        .rules-editor {
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .rule-row-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background-color: #0d1222;
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            transition: background-color 0.2s;
+        }
+
+        .rule-row-item:hover {
+            background-color: #12182c;
+        }
+
+        .rule-row-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+
+        .rule-btn-group {
+            display: flex;
+            gap: 4px;
+            background: #1b1c1e;
+            padding: 3px;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+        }
+
+        .rule-btn {
+            padding: 6px 12px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+        }
+
+        .rule-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+        }
+
+        .rule-btn.selected {
+            background: var(--primary-grad);
+            color: #0b0f19;
+            box-shadow: 0 0 8px rgba(237, 99, 0, 0.4);
+        }
+
+        select {
+            background-color: #0d1222;
+            color: var(--text-main);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.2s;
+            width: 100%;
+        }
+
+        select:hover {
+            border-color: var(--primary-color);
+        }
+
+        /* Buttons styling */
+        .actions-group {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 700;
+            padding: 14px 24px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .btn-primary {
+            background: var(--primary-grad);
+            color: #0b0f19;
+            box-shadow: 0 4px 15px rgba(237, 99, 0, 0.25);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(237, 99, 0, 0.4);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-bg);
+            color: var(--text-main);
+            border: 1px solid var(--card-border);
+        }
+
+        .btn-secondary:hover {
+            background-color: #273549;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Solver results dashboard */
+        .results-panel {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Visual Board CSS */
+        .visual-board {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            margin-top: 15px;
+        }
+
+        .layer-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .layer-label {
+            width: 110px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .layer-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-main);
+        }
+
+        .pin-pos-text {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            transition: color 0.3s;
+        }
+
+        .pin-pos-text.aligned {
+            color: var(--target-gold);
+            font-weight: bold;
+        }
+
+        .track {
+            position: relative;
+            flex-grow: 1;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            background: #0d1222;
+            border-radius: 20px;
+            height: 38px;
+            align-items: center;
+            padding: 0 4px;
+            border: 1px solid var(--card-border);
+        }
+
+        .slot {
+            height: 12px;
+            width: 12px;
+            background: #1e293b;
+            border-radius: 50%;
+            margin: auto;
+            position: relative;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+            font-size: 0; /* hide number text visually but keep semantic */
+        }
+
+        .slot.target {
+            border: 2.5px solid var(--target-gold);
+            box-shadow: 0 0 10px rgba(224, 169, 109, 0.4);
+            background: #2a2015;
+            height: 14px;
+            width: 14px;
+        }
+
+        .pin {
+            position: absolute;
+            top: 50%;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle at 30% 30%, #ff9d47 0%, #ed6300 100%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: left 0.45s cubic-bezier(0.25, 0.8, 0.25, 1.1);
+            box-shadow: 0 0 14px #ed6300, inset 0 2px 4px rgba(255,255,255,0.6);
+            z-index: 2;
+            cursor: pointer;
+        }
+
+        /* Step by step navigation card */
+        .nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .nav-header h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+        }
+
+        .step-badge {
+            background-color: var(--secondary-bg);
+            border: 1px solid var(--card-border);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-secondary);
+        }
+
+        .steps-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+            min-height: 175px;
+        }
+
+        @media (min-width: 640px) {
+            .steps-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .step-card {
+            background-color: #0d1222;
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+        }
+
+        .step-card:hover {
+            border-color: var(--primary-color);
+            background-color: #12182c;
+            transform: translateY(-2px);
+        }
+
+        .step-card.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(237, 99, 0, 0.04);
+            box-shadow: inset 0 0 15px rgba(237, 99, 0, 0.08), 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .step-card.selected::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 4px;
+            background: var(--primary-grad);
+        }
+
+        .step-num-badge {
+            font-size: 0.75rem;
+            font-weight: 800;
+            background-color: var(--secondary-bg);
+            padding: 3px 8px;
+            border-radius: 6px;
+            align-self: flex-start;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .step-card.selected .step-num-badge {
+            background-color: var(--primary-color);
+            color: #0b0f19;
+        }
+
+        .step-details {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .step-action {
+            font-size: 1.05rem;
+            font-weight: 500;
+            color: var(--text-main);
+            line-height: 1.4;
+        }
+
+        .highlight-layer {
+            color: #fff;
+            text-shadow: 0 0 8px rgba(255,255,255,0.1);
+        }
+
+        .dir-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .dir-badge.left {
+            background-color: var(--left-badge-bg);
+            color: var(--left-badge-color);
+        }
+
+        .dir-badge.right {
+            background-color: var(--right-badge-bg);
+            color: var(--right-badge-color);
+        }
+
+        .count-badge {
+            color: var(--target-gold);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            margin-left: 2px;
+        }
+
+        .step-result-state {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            margin-top: 5px;
+            border-top: 1px dashed var(--card-border);
+            padding-top: 8px;
+        }
+
+        .nav-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-dots {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .nav-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #242c42;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-dot:hover {
+            background-color: var(--text-secondary);
+            transform: scale(1.2);
+        }
+
+        .nav-dot.active {
+            background-color: var(--primary-color);
+            box-shadow: 0 0 8px var(--primary-color);
+            width: 20px;
+            border-radius: 4px;
+        }
+
+        /* Checklist Card styling */
+        .checklist-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 250px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        /* Scrollbar customization */
+        .checklist-steps::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .checklist-steps::-webkit-scrollbar-track {
+            background: #0d1222;
+            border-radius: 3px;
+        }
+
+        .checklist-steps::-webkit-scrollbar-thumb {
+            background: var(--card-border);
+            border-radius: 3px;
+        }
+
+        .checklist-steps::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background-color: #0d1222;
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .checklist-item:hover {
+            border-color: rgba(237, 99, 0, 0.4);
+            background-color: #12182c;
+        }
+
+        .checklist-item.active {
+            border-color: var(--primary-color);
+            background-color: rgba(237, 99, 0, 0.05);
+        }
+
+        .chk-step-num {
+            font-size: 0.75rem;
+            font-weight: 700;
+            background-color: var(--secondary-bg);
+            color: var(--text-secondary);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .checklist-item.active .chk-step-num {
+            background-color: var(--primary-color);
+            color: #0b0f19;
+        }
+
+        .chk-step-desc {
+            flex-grow: 1;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .dir-text.left {
+            color: var(--left-badge-color);
+            font-weight: 600;
+        }
+
+        .dir-text.right {
+            color: var(--right-badge-color);
+            font-weight: 600;
+        }
+
+        .chk-step-pins {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Error Banner styling */
+        .error-banner {
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--danger-color);
+            color: #fca5a5;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .error-banner svg {
+            flex-shrink: 0;
+        }
+
+        /* Footer styling */
+        .footer {
+            margin-top: 50px;
+            padding-top: 25px;
+            border-top: 1px solid var(--card-border);
+            display: flex;
+            justify-content: center;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .footer-top {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        .footer-logo {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid var(--card-border);
+            background-color: var(--card-bg);
+        }
+
+        .footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s ease, text-shadow 0.2s ease;
+        }
+
+        .footer a:hover {
+            color: #ff8700;
+            text-shadow: 0 0 8px rgba(237, 99, 0, 0.5);
+        }
+
+        .eula-link {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s, text-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .eula-link:hover {
+            color: var(--primary-color);
+            text-shadow: 0 0 6px rgba(237, 99, 0, 0.4);
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 600px) {
+            body {
+                padding: 16px 10px;
+            }
+
+            header {
+                margin-bottom: 25px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .subtitle {
+                font-size: 0.95rem;
+            }
+
+            .card {
+                padding: 16px;
+                margin-bottom: 20px;
+                border-radius: 12px;
+            }
+
+            .card h2 {
+                font-size: 1.25rem;
+                margin-bottom: 15px;
+                padding-bottom: 10px;
+            }
+
+            /* Stack starting positions if they overflow */
+            .pos-selector-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .pos-btn-group {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .pos-btn {
+                flex: 1;
+                height: 36px;
+                min-width: 0;
+            }
+
+            /* Rules row styling on mobile */
+            .rule-row-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+                padding: 12px;
+            }
+
+            .rule-btn-group {
+                width: 100%;
+            }
+
+            .rule-btn {
+                flex: 1;
+                text-align: center;
+                padding: 8px 0;
+            }
+
+            /* Stack actions group buttons vertically */
+            .actions-group {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            /* Visual Tracker Rows - Stack label and track vertically */
+            .layer-row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+                border-bottom: 1px dashed rgba(36, 44, 66, 0.5);
+                padding-bottom: 12px;
+            }
+
+            .layer-row:last-child {
+                border-bottom: none;
+                padding-bottom: 0;
+            }
+
+            .layer-label {
+                width: 100%;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .track {
+                height: 42px;
+            }
+
+            .pin {
+                width: 22px;
+                height: 22px;
+            }
+
+            /* Steps and navigation controls */
+            .nav-controls {
+                gap: 10px;
+            }
+
+            .nav-controls .btn {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+            }
+
+            .nav-dot {
+                width: 6px;
+                height: 6px;
+            }
+
+            .nav-dot.active {
+                width: 14px;
+            }
+
+            /* Checklist items styling on mobile */
+            .checklist-item {
+                gap: 10px;
+                padding: 8px 12px;
+            }
+
+            .chk-step-desc {
+                font-size: 0.8rem;
+            }
+
+            .chk-step-pins {
+                font-size: 0.7rem;
+            }
+        }
+
+        /* Video Embed Card & Container */
+        .video-card {
+            margin-top: 30px;
+        }
+
+        .video-card h2 {
+            text-align: center;
+            justify-content: center;
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 20px;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* EULA Modal Overlay Styling */
+        .eula-overlay {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(6, 9, 20, 0.85);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .eula-modal {
+            background-color: var(--card-bg);
+            border: 1.5px solid var(--primary-color);
+            box-shadow: 0 0 25px rgba(237, 99, 0, 0.25), 0 20px 40px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 600px;
+            max-height: 80vh;
+            border-radius: 16px;
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            animation: modalSlideIn 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-sizing: border-box;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .eula-close-x {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            line-height: 1;
+            transition: color 0.2s;
+            outline: none;
+        }
+
+        .eula-close-x:hover {
+            color: var(--primary-color);
+        }
+
+        .eula-modal h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: var(--text-main);
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 12px;
+        }
+
+        .eula-body {
+            overflow-y: auto;
+            flex-grow: 1;
+            margin-bottom: 24px;
+            padding-right: 8px;
+            font-size: 0.92rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            text-align: left;
+        }
+
+        /* Scrollbar styling for EULA text box */
+        .eula-body::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .eula-body::-webkit-scrollbar-track {
+            background: #0d1222;
+            border-radius: 3px;
+        }
+
+        .eula-body::-webkit-scrollbar-thumb {
+            background: var(--card-border);
+            border-radius: 3px;
+        }
+
+        .eula-body::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        .eula-body h3 {
+            font-size: 1.05rem;
+            color: var(--text-main);
+            margin-top: 18px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .eula-body p {
+            margin-bottom: 12px;
+        }
+
+        .eula-actions {
+            display: flex;
+            justify-content: flex-end;
+            border-top: 1px solid var(--card-border);
+            padding-top: 16px;
+        }
+
+        .btn-close {
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 700;
+            padding: 10px 24px;
+            border-radius: 8px;
+            border: none;
+            background-color: var(--secondary-bg);
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-close:hover {
+            background-color: #273549;
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Gothic Remake Lockpicking Tool</h1>
+        <p class="subtitle">The Number 1 Gothic 1 Remake Lockpicking Solver</p>
+    </header>
+    
+    <div class="app-grid">
+        <!-- Configuration Area -->
+        <div class="config-panel">
+            <!-- Settings: Number of Layers -->
+            <div class="card">
+                <h2><span class="step-number">1</span>Number of Layers</h2>
+                <p class="instruction-text">Select how many layers are in the puzzle (default is 6).</p>
+                <div class="pos-selector-row" style="margin-bottom: 0;">
+                    <span class="pos-label">Layers</span>
+                    <div class="pos-btn-group" id="layers-selector">
+                        <!-- Javascript will populate button options: 3, 4, 5, 6, 7, 8 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Starting positions -->
+            <div class="card">
+                <h2><span class="step-number">2</span>Starting Pin Positions</h2>
+                <p class="instruction-text">Select the current hole number (1-7) for each layer.</p>
+                <div id="start-positions">
+                    <!-- Javascript will populate this visually -->
+                </div>
+            </div>
+
+            <!-- Interconnection Rules -->
+            <div class="card">
+                <h2><span class="step-number">3</span>Interconnection Rules</h2>
+                <p class="instruction-text">Define how the layers affect each other. Select a layer below, then configure how it influences the other layers.</p>
+                
+                <div style="margin-bottom: 20px;">
+                    <label for="active-layer-select" style="font-weight:600; font-size:0.85rem; color:var(--text-secondary); display:block; margin-bottom: 8px;">Select Layer to Program:</label>
+                    <select id="active-layer-select" onchange="changeActiveConfigLayer()">
+                        <!-- JavaScript will populate options -->
+                    </select>
+                </div>
+                
+                <div class="rules-editor" id="rules-rows-container">
+                    <!-- Javascript will populate rows dynamically -->
+                </div>
+                
+                <div class="actions-group">
+                    <button class="btn btn-primary" onclick="calculatePath()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m10 8 4 4-4 4"/></svg>
+                        Find Sequence
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetToDefaults()">
+                        Reset Defaults
+                    </button>
+                </div>
+                
+                <div id="error-container"></div>
+            </div>
+        </div>
+
+        <!-- Solutions Dashboard (initially hidden) -->
+        <div id="results-panel" class="results-panel" style="display: none;">
+            
+            <!-- Live Visualization Card -->
+            <div class="card">
+                <h2>Visual Lock Tracker</h2>
+                <p class="instruction-text">Live visualization of pins moving as you step through the solution. Hole 4 (glowing gold) is the target alignment.</p>
+                <div id="board-rows">
+                    <!-- Dynamic rendering of tracks -->
+                </div>
+            </div>
+
+            <!-- Step by Step Navigator -->
+            <div class="card">
+                <div class="nav-header">
+                    <h2>Step-by-Step Guide</h2>
+                    <span class="step-badge" id="step-badge">Steps 1-2 of 8</span>
+                </div>
+                <p class="instruction-text" style="margin-top: -10px; margin-bottom: 20px;">Follow the highlighted steps. Click a step card to view its result on the board above.</p>
+                
+                <div class="steps-container" id="active-steps">
+                    <!-- Active 2 steps -->
+                </div>
+                
+                <div class="nav-controls">
+                    <button id="prev-btn" onclick="prevPage()" class="btn btn-secondary" style="padding: 10px 18px; font-size: 0.9rem;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                        Previous
+                    </button>
+                    <div class="nav-dots" id="nav-dots">
+                        <!-- Navigation dots -->
+                    </div>
+                    <button id="next-btn" onclick="nextPage()" class="btn btn-primary" style="padding: 10px 18px; font-size: 0.9rem;">
+                        Next
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Scrollable checklist overview -->
+            <div class="card">
+                <h2>All Steps Checklist</h2>
+                <p class="instruction-text">Quick index of all moves. Click any step to instantly jump to that point in the solver.</p>
+                <div class="checklist-steps" id="checklist-steps">
+                    <!-- List of all steps -->
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Video Section -->
+    <div class="video-card card">
+        <h2>How To Use It</h2>
+        <div class="video-container">
+            <!-- Replace YOUR_VIDEO_ID with your actual YouTube video ID -->
+            <iframe 
+                src="https://www.youtube.com/embed/r4hBlTw7vPc?autoplay=1&mute=1&loop=1&playlist=r4hBlTw7vPc" 
+                title="YouTube video player" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                referrerpolicy="strict-origin-when-cross-origin" 
+                allowfullscreen>
+            </iframe>
+        </div>
+    </div>
+    
+    <footer class="footer">
+        <img class="footer-logo" src="data:image/png;base64,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" alt="Firespark81 Logo" />
+        <span>A Tool By <a href="https://www.youtube.com/firespark81" target="_blank">Firespark81</a></span>
+    </footer>
+</div>
+
+<script>
+    let P=6;const TARGET_HOLE=4;let starts=[1,1,1,1,1,1,1,1],rules={},currentGroupedSteps=[],currentPage=0,selectedStepIndex=-1,activeConfigLayer=1;function init(){initLayersSelectorUI(),initStartsUI(),initRulesUI(),renderVisualBoard()}function initLayersSelectorUI(){const e=document.getElementById("layers-selector");e.innerHTML="";for(let t=3;t<=8;t++){let n=document.createElement("button");n.className="pos-btn "+(P===t?"selected":""),n.textContent=t,n.onclick=e=>{e.preventDefault(),changeP(t)},e.appendChild(n)}}function changeP(e){e!==P&&(P=e,activeConfigLayer>P&&(activeConfigLayer=1),initLayersSelectorUI(),initStartsUI(),initRulesUI(),renderVisualBoard(),document.getElementById("results-panel").style.display="none",document.getElementById("error-container").innerHTML="")}function initStartsUI(){const e=document.getElementById("start-positions");e.innerHTML="";for(let t=1;t<=P;t++){let n=document.createElement("div");n.className="pos-selector-row";let s=document.createElement("span");s.className="pos-label",s.textContent=`Layer ${t}`,n.appendChild(s);let l=document.createElement("div");l.className="pos-btn-group";for(let e=1;e<=7;e++){let n=document.createElement("button");n.className="pos-btn "+(starts[t-1]===e?"selected":""),n.id=`btn-start-${t}-${e}`,n.textContent=e,n.onclick=n=>{n.preventDefault(),setStartPos(t,e)},l.appendChild(n)}n.appendChild(l),e.appendChild(n)}}function setStartPos(e,t){starts[e-1]=t;for(let n=1;n<=7;n++){let s=document.getElementById(`btn-start-${e}-${n}`);s&&(n===t?s.classList.add("selected"):s.classList.remove("selected"))}}function initRulesUI(){const e=document.getElementById("active-layer-select");e.innerHTML="";for(let t=1;t<=P;t++){let n=document.createElement("option");n.value=t,n.textContent=`Layer ${t}`,t===activeConfigLayer&&(n.selected=1),e.appendChild(n)}renderRulesRows()}function changeActiveConfigLayer(){const e=document.getElementById("active-layer-select");activeConfigLayer=parseInt(e.value),renderRulesRows()}function renderRulesRows(){const e=document.getElementById("rules-rows-container");e.innerHTML="";let t=0;for(let n=1;n<=P;n++){if(n===activeConfigLayer)continue;t=1;let s=`${activeConfigLayer}_${n}`,l=void 0!==rules[s]?rules[s]:0,r=document.createElement("div");r.className="rule-row-item",r.innerHTML=`\n                <span class="rule-row-label">Affects Layer ${n}</span>\n                <div class="rule-btn-group">\n                    <button class="rule-btn ${0===l?"selected":""}" onclick="setRule(${activeConfigLayer}, ${n}, 0)">None</button>\n                    <button class="rule-btn ${1===l?"selected":""}" onclick="setRule(${activeConfigLayer}, ${n}, 1)">Same</button>\n                    <button class="rule-btn ${-1===l?"selected":""}" onclick="setRule(${activeConfigLayer}, ${n}, -1)">Opposite</button>\n                </div>\n            `,e.appendChild(r)}t||(e.innerHTML='<div class="instruction-text" style="text-align: center; margin: 10px 0;">Need at least 2 layers to define interactions.</div>')}function setRule(e,t,n){rules[`${e}_${t}`]=n,renderRulesRows()}function resetToDefaults(){starts=[1,1,1,1,1,1,1,1],rules={},initStartsUI(),initRulesUI(),document.getElementById("results-panel").style.display="none",document.getElementById("error-container").innerHTML=""}function groupMoves(e){if(!e||0===e.length)return[];let t=[],n={layer:e[0].layer,dir:e[0].dir,count:1,result:[...e[0].result]};for(let s=1;s<e.length;s++){let l=e[s];l.layer===n.layer&&l.dir===n.dir?(n.count++,n.result=[...l.result]):(t.push(n),n={layer:l.layer,dir:l.dir,count:1,result:[...l.result]})}return t.push(n),t}function calculatePath(){const e=document.getElementById("error-container"),t=document.getElementById("results-panel");e.innerHTML="";let n=new Array(P).fill(4).join(","),s=starts.slice(0,P),l=Array.from(Array(P),()=>new Array(P).fill(0));for(let e=1;e<=P;e++)for(let t=1;t<=P;t++)if(e===t)l[e-1][t-1]=1;else{let n=`${e}_${t}`,s=void 0!==rules[n]?rules[n]:0;l[e-1][t-1]=s}if(s.join(",")===n)return t.style.display="block",currentGroupedSteps=[],currentPage=0,selectedStepIndex=-1,renderVisualBoard(),updateVisualBoard(s),document.getElementById("active-steps").innerHTML='<div class="instruction-text" style="grid-column: 1/-1; text-align: center; margin: 20px 0;">Pins are already in the target alignment (all in hole 4)!</div>',document.getElementById("step-badge").textContent="Completed",document.getElementById("prev-btn").disabled=1,document.getElementById("next-btn").disabled=1,document.getElementById("nav-dots").innerHTML="",document.getElementById("checklist-steps").innerHTML=`\n                <div class="checklist-item active">\n                    <div class="chk-step-num">✓</div>\n                    <div class="chk-step-desc">All pins aligned in Center (Hole 4)</div>\n                    <div class="chk-step-pins">[${s.join(", ")}]</div>\n                </div>`,void t.scrollIntoView({behavior:"smooth"});let r=[{state:[...s],path:[]}],a=new Set;a.add(s.join(","));let i=null;for(;r.length>0;){let e=r.shift();for(let t=0;t<P;t++)for(let s of[-1,1]){let c=[...e.state],o=0;for(let e=0;e<P;e++){let n=l[t][e];if(c[e]+=s*n,c[e]<1||c[e]>7){o=1;break}}if(!o){let l=c.join(","),o={layer:t+1,dir:1===s?"Left":"Right",result:c};if(l===n){i=[...e.path,o],r=[];break}a.has(l)||(a.add(l),r.push({state:c,path:[...e.path,o]}))}}}if(!i)return t.style.display="none",void(e.innerHTML='\n                <div class="error-banner">\n                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>\n                    <span>Unsolvable! The boundary (1-7) constraints prevent solving from this starting configuration. Please double check rules and starting positions.</span>\n                </div>\n            ');currentGroupedSteps=groupMoves(i),currentPage=0,t.style.display="block",renderVisualBoard();let c=Math.min(1,currentGroupedSteps.length-1);renderPage(),renderChecklist(),selectStep(c),t.scrollIntoView({behavior:"smooth"})}function renderVisualBoard(){const e=document.getElementById("board-rows");e.innerHTML="";for(let t=1;t<=P;t++){let n=`\n                <div class="layer-row">\n                    <div class="layer-label">\n                        <span class="layer-name">Layer ${t}</span>\n                        <span class="pin-pos-text" id="pos-val-${t}">Hole -</span>\n                    </div>\n                    <div class="track" id="track-${t}">\n                        <div class="slot slot-1">1</div>\n                        <div class="slot slot-2">2</div>\n                        <div class="slot slot-3">3</div>\n                        <div class="slot slot-4 target">4</div>\n                        <div class="slot slot-5">5</div>\n                        <div class="slot slot-6">6</div>\n                        <div class="slot slot-7">7</div>\n                        <div class="pin" id="pin-${t}"></div>\n                    </div>\n                </div>\n            `;e.innerHTML+=n}}function updateVisualBoard(e){for(let t=0;t<P;t++){let n=e[t],s=document.getElementById(`pin-${t+1}`),l=document.getElementById(`pos-val-${t+1}`);s&&(s.style.left=`calc((100% / 7) * (${n} - 0.5))`),l&&(l.textContent=`Hole ${n}`,l.className=4===n?"pin-pos-text aligned":"pin-pos-text")}}function selectStep(e){selectedStepIndex=e,updateVisualBoard(-1===e?starts.slice(0,P):currentGroupedSteps[e].result),document.querySelectorAll(".step-card").forEach(t=>{parseInt(t.getAttribute("data-step-index"))===e?t.classList.add("selected"):t.classList.remove("selected")}),document.querySelectorAll(".checklist-item").forEach(t=>{parseInt(t.getAttribute("data-step-index"))===e?t.classList.add("active"):t.classList.remove("active")})}function renderPage(){const e=document.getElementById("active-steps"),t=document.getElementById("step-badge"),n=document.getElementById("prev-btn"),s=document.getElementById("next-btn");e.innerHTML="";let l=currentGroupedSteps.length,r=Math.ceil(l/2);if(0===l)return;let a=2*currentPage,i=Math.min(a+1,l-1);t.textContent=`Steps ${a+1}-${i+1} of ${l}`,n.disabled=0===currentPage,s.disabled=currentPage===r-1;const c=document.getElementById("nav-dots");c.innerHTML="";for(let e=0;e<r;e++){let t=document.createElement("span");t.className="nav-dot "+(e===currentPage?"active":""),t.onclick=()=>{currentPage=e,renderPage(),selectStep(Math.min(2*currentPage+1,currentGroupedSteps.length-1))},c.appendChild(t)}for(let t=a;t<=i;t++){let n=currentGroupedSteps[t],s=document.createElement("div");s.className="step-card "+(selectedStepIndex===t?"selected":""),s.setAttribute("data-step-index",t),s.onclick=()=>selectStep(t);let l="Right"===n.dir?"→":"←",r=n.dir.toLowerCase();s.innerHTML=`\n                <div class="step-num-badge">Step ${t+1}</div>\n                <div class="step-details">\n                    <div class="step-action">\n                        Move <strong class="highlight-layer">Layer ${n.layer}</strong> \n                        <span class="dir-badge ${r}">${n.dir} ${l}</span> \n                        <strong class="count-badge">${n.count}x</strong>\n                    </div>\n                    <div class="step-result-state">Pins: [${n.result.join(", ")}]</div>\n                </div>\n            `,e.appendChild(s)}}function prevPage(){currentPage>0&&(currentPage--,renderPage(),selectStep(Math.min(2*currentPage+1,currentGroupedSteps.length-1)))}function nextPage(){let e=Math.ceil(currentGroupedSteps.length/2);currentPage<e-1&&(currentPage++,renderPage(),selectStep(Math.min(2*currentPage+1,currentGroupedSteps.length-1)))}function renderChecklist(){const e=document.getElementById("checklist-steps");e.innerHTML="";let t=starts.slice(0,P),n=document.createElement("div");n.className="checklist-item "+(-1===selectedStepIndex?"active":""),n.setAttribute("data-step-index",-1),n.onclick=()=>selectStep(-1),n.innerHTML=`\n            <div class="chk-step-num">0</div>\n            <div class="chk-step-desc">Starting Configuration</div>\n            <div class="chk-step-pins">[${t.join(", ")}]</div>\n        `,e.appendChild(n),currentGroupedSteps.forEach((t,n)=>{let s=document.createElement("div");s.className="checklist-item "+(selectedStepIndex===n?"active":""),s.setAttribute("data-step-index",n),s.onclick=()=>{currentPage=Math.floor(n/2),renderPage(),selectStep(n)};let l="Right"===t.dir?"→":"←",r=t.dir.toLowerCase();s.innerHTML=`\n                <div class="chk-step-num">${n+1}</div>\n                <div class="chk-step-desc">\n                    Move Layer ${t.layer} <span class="dir-text ${r}">${t.dir} ${l}</span> ${t.count}x\n                </div>\n                <div class="chk-step-pins">[${t.result.join(", ")}]</div>\n            `,e.appendChild(s)})}function openEULA(e){e&&e.preventDefault(),document.getElementById("eula-modal-overlay").style.display="flex"}function closeEULA(){document.getElementById("eula-modal-overlay").style.display="none"}function setupFooter(){const e=document.querySelector(".footer");if(e){const t=document.createElement("div");for(t.className="footer-top";e.firstChild;)t.appendChild(e.firstChild);const n=document.createElement("a");n.href="#",n.className="eula-link",n.textContent="End User License Agreement",n.onclick=openEULA;const s=document.createElement("div");s.className="eula-link-container",s.appendChild(n);const l=document.createElement("div");l.className="footer-content",l.appendChild(t),l.appendChild(s),e.appendChild(l)}}window.addEventListener("click",function(e){const t=document.getElementById("eula-modal-overlay");e.target===t&&closeEULA()}),window.onload=()=>{init(),setupFooter()};
+</script>
+
+<!-- EULA Popup Modal Overlay -->
+<div id="eula-modal-overlay" class="eula-overlay">
+    <div class="eula-modal">
+        <button class="eula-close-x" onclick="closeEULA()">&times;</button>
+        <h2>End User License Agreement (EULA)</h2>
+        <div class="eula-body">
+            <p><strong>Tool:</strong> Gothic Remake Lockpicking Tool</p>
+            <p><strong>Creator:</strong> Firespark81</p>
+            <p>By accessing or using the Gothic Remake Lockpicking Tool ("the Tool"), you agree to be bound by the terms of this agreement. If you do not agree to these terms, do not use the Tool.</p>
+            
+            <h3>1. License Grant</h3>
+            <p>Firespark81 grants you a limited, personal, non-exclusive, non-transferable, and revocable license to use the Tool strictly for personal, non-commercial entertainment purposes.</p>
+            
+            <h3>2. Restrictions</h3>
+            <p>You are explicitly prohibited from doing any of the following:</p>
+            <p><strong>Copying and Hosting:</strong> You may not copy, download, frame, or host the Tool (or its source code) on any other website, server, or platform.</p>
+            <p><strong>Modification:</strong> You may not edit, modify, alter, reverse-engineer, or create derivative works based on the Tool's HTML, CSS, JavaScript, or associated assets.</p>
+            <p><strong>Commercial Use:</strong> You may not use the Tool, or any part of it, for commercial purposes. This includes selling access, gating it behind a paywall, generating ad revenue by hosting it, or utilizing it to promote a business or service.</p>
+            
+            <h3>3. Intellectual Property</h3>
+            <p>All rights, title, and interest in and to the Tool, including all code, design, text, and copyrights, are owned exclusively by Firespark81. The Tool is licensed to you, not sold.</p>
+            
+            <h3>4. Termination</h3>
+            <p>This license is effective until terminated. Firespark81 reserves the right to terminate your license immediately and without notice if you fail to comply with any term of this EULA. Upon termination, you must immediately cease all use of the Tool and destroy any unauthorized copies in your possession.</p>
+            
+            <h3>5. Disclaimer of Warranty</h3>
+            <p>The Tool is provided "AS IS," without warranty of any kind, express or implied. Firespark81 does not guarantee that the Tool will function uninterrupted, be error-free, or remain available.</p>
+            
+            <h3>6. Limitation of Liability</h3>
+            <p>In no event shall Firespark81 be liable for any direct, indirect, incidental, or consequential damages arising out of your use or inability to use the Tool.</p>
+        </div>
+        <div class="eula-actions">
+            <button class="btn-close" onclick="closeEULA()">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Ko-fi Overlay Widget -->
+<script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
+<script>
+  kofiWidgetOverlay.draw('firespark81', {
+    'type': 'floating-chat',
+    'floating-chat.donateButton.text': 'Support me',
+    'floating-chat.donateButton.background-color': '#f45d22',
+    'floating-chat.donateButton.text-color': '#fff'
+  });
+</script>
+
+</body>
+</html>
