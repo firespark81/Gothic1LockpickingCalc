@@ -1,0 +1,29 @@
+End User License Agreement (EULA)
+Tool: Gothic Remake Lockpicking Tool
+Creator: Firespark81
+
+By accessing or using the Gothic Remake Lockpicking Tool ("the Tool"), you agree to be bound by the terms of this agreement. If you do not agree to these terms, do not use the Tool.
+
+1. License Grant
+Firespark81 grants you a limited, personal, non-exclusive, non-transferable, and revocable license to use the Tool strictly for personal, non-commercial entertainment purposes.
+
+2. Restrictions
+You are explicitly prohibited from doing any of the following:
+
+Copying and Hosting: You may not copy, download, frame, or host the Tool (or its source code) on any other website, server, or platform.
+
+Modification: You may not edit, modify, alter, reverse-engineer, or create derivative works based on the Tool's HTML, CSS, JavaScript, or associated assets.
+
+Commercial Use: You may not use the Tool, or any part of it, for commercial purposes. This includes selling access, gating it behind a paywall, generating ad revenue by hosting it, or utilizing it to promote a business or service.
+
+3. Intellectual Property
+All rights, title, and interest in and to the Tool, including all code, design, text, and copyrights, are owned exclusively by Firespark81. The Tool is licensed to you, not sold.
+
+4. Termination
+This license is effective until terminated. Firespark81 reserves the right to terminate your license immediately and without notice if you fail to comply with any term of this EULA. Upon termination, you must immediately cease all use of the Tool and destroy any unauthorized copies in your possession.
+
+5. Disclaimer of Warranty
+The Tool is provided "AS IS," without warranty of any kind, express or implied. Firespark81 does not guarantee that the Tool will function uninterrupted, be error-free, or remain available.
+
+6. Limitation of Liability
+In no event shall Firespark81 be liable for any direct, indirect, incidental, or consequential damages arising out of your use or inability to use the Tool.
